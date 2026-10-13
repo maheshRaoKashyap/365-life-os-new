@@ -183,10 +183,16 @@ export default function LifeOSApp() {
     await loadAll(userId);
   }
 
-  async function submitDaily() {
+   async function submitDaily() {
     if (!userId || !daily) return;
+    const { id: _id, ...rest } = daily as DailyRecord & { id?: string };
     const payload = {
-      user_id: userId, record_date: today, ...daily, score: todayScore, submitted: true, updated_at: new Date().toISOString(),
+      ...rest,
+      user_id: userId,
+      record_date: today,
+      score: todayScore,
+      submitted: true,
+      updated_at: new Date().toISOString(),
     };
     const { error } = await supabase.from("daily_records").upsert(payload, { onConflict: "user_id,record_date" });
     if (error) { flash(error.message); return; }
